@@ -483,7 +483,7 @@ export const AdminSiteSettingsPage: React.FC = () => {
       <CMSSectionCard
         id="section-address"
         title="Headquarters Physical Address"
-        subtitle="Registered European headquarters in Brussels, Belgium"
+        subtitle="Registered Headquarters Address"
         icon={MapPin}
         badge="Physical Location"
       >

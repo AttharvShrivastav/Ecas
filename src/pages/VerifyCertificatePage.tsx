@@ -121,10 +121,6 @@ export const VerifyCertificatePage: React.FC = () => {
       >
         {/* Page Header Block */}
         <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#032E64]/8 text-[#032E64] text-xs font-bold uppercase tracking-wider mb-3">
-            <ShieldCheck size={16} weight="fill" />
-            <span>Official Register</span>
-          </div>
 
           <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-bold text-[#082046] tracking-tight leading-tight">
             Verify Certificate

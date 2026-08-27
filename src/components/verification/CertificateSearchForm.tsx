@@ -143,34 +143,6 @@ export const CertificateSearchForm: React.FC<CertificateSearchFormProps> = ({
         )}
       </form>
 
-      {/* Demo helper shortcuts for instant client testing */}
-      <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs text-[#64748B]">
-        <span className="flex items-center gap-1 font-medium text-[#475569]">
-          <Sparkle size={13} weight="fill" className="text-[#032E64]" />
-          <span>Demo records:</span>
-        </span>
-        {DEMO_SUGGESTIONS.map((item) => (
-          <button
-            key={item.label}
-            type="button"
-            onClick={() => handleDemoClick(item.label)}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/80 hover:bg-white border border-[#CBD5E1]/70 hover:border-[#032E64]/40 text-[#082046] font-medium transition-all shadow-2xs hover:shadow-xs cursor-pointer"
-          >
-            <span className="font-mono text-[11px]">{item.label}</span>
-            <span
-              className={`text-[9px] font-bold px-1.5 py-0.2 rounded ${
-                item.tag === 'Valid'
-                  ? 'bg-[#DCFCE7] text-[#15803D]'
-                  : item.tag === 'Expired'
-                  ? 'bg-[#FEE2E2] text-[#B91C1C]'
-                  : 'bg-[#FEF3C7] text-[#B45309]'
-              }`}
-            >
-              {item.tag}
-            </span>
-          </button>
-        ))}
-      </div>
     </div>
   );
 };
