@@ -1,0 +1,127 @@
+<svg width="800" height="700" viewBox="0 0 800 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A" />
+      <stop offset="50%" stop-color="#1E293B" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+    <linearGradient id="pipeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#64748B" />
+      <stop offset="25%" stop-color="#94A3B8" />
+      <stop offset="50%" stop-color="#CBD5E1" />
+      <stop offset="75%" stop-color="#94A3B8" />
+      <stop offset="100%" stop-color="#475569" />
+    </linearGradient>
+    <linearGradient id="vesselGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#334155" />
+      <stop offset="35%" stop-color="#64748B" />
+      <stop offset="70%" stop-color="#CBD5E1" />
+      <stop offset="100%" stop-color="#334155" />
+    </linearGradient>
+    <linearGradient id="jacketGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0C1B33" />
+      <stop offset="100%" stop-color="#081426" />
+    </linearGradient>
+    <linearGradient id="helmetGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#CBD5E1" />
+    </linearGradient>
+    <radialGradient id="lightGlow1" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FCD34D" stop-opacity="0.8" />
+      <stop offset="50%" stop-color="#F59E0B" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Industrial Facility Background -->
+  <rect width="800" height="700" fill="url(#bgGrad)" />
+
+  <!-- Overhead Structure & Factory Framework -->
+  <path d="M0 80 L800 80 M0 140 L800 140 M120 0 L120 700 M280 0 L280 700 M460 0 L460 700 M640 0 L640 700" stroke="#334155" stroke-width="3" stroke-opacity="0.4" />
+  <path d="M120 80 L280 140 M280 80 L460 140 M460 80 L640 140" stroke="#334155" stroke-width="2" stroke-opacity="0.3" />
+
+  <!-- Background Lights with Warm Glow -->
+  <circle cx="180" cy="180" r="60" fill="url(#lightGlow1)" />
+  <circle cx="180" cy="180" r="8" fill="#FFFBEB" />
+  <circle cx="560" cy="120" r="50" fill="url(#lightGlow1)" />
+  <circle cx="560" cy="120" r="6" fill="#FFFBEB" />
+
+  <!-- Vertical Large Piping System (Background) -->
+  <rect x="220" y="40" width="36" height="660" fill="url(#pipeGrad)" />
+  <rect x="214" y="240" width="48" height="18" rx="4" fill="#94A3B8" />
+  <rect x="270" y="20" width="44" height="680" fill="url(#pipeGrad)" />
+  <rect x="264" y="320" width="56" height="20" rx="4" fill="#94A3B8" />
+
+  <!-- Large Horizontal Pressure Vessel / Heat Exchanger -->
+  <rect x="290" y="260" width="480" height="190" rx="20" fill="url(#vesselGrad)" />
+  <!-- Vessel Flange & Bolting Ring -->
+  <rect x="330" y="240" width="34" height="230" rx="6" fill="#64748B" />
+  <circle cx="347" cy="270" r="6" fill="#CBD5E1" />
+  <circle cx="347" cy="300" r="6" fill="#CBD5E1" />
+  <circle cx="347" cy="330" r="6" fill="#CBD5E1" />
+  <circle cx="347" cy="360" r="6" fill="#CBD5E1" />
+  <circle cx="347" cy="390" r="6" fill="#CBD5E1" />
+  <circle cx="347" cy="420" r="6" fill="#CBD5E1" />
+  <circle cx="347" cy="450" r="6" fill="#CBD5E1" />
+
+  <!-- Secondary Piping and Valves -->
+  <path d="M420 180 L420 260 M420 450 L420 580" stroke="url(#pipeGrad)" stroke-width="32" stroke-linecap="round" />
+  <rect x="400" y="200" width="40" height="20" rx="4" fill="#00607A" />
+  <circle cx="420" cy="170" r="22" stroke="#CBD5E1" stroke-width="6" fill="none" />
+  
+  <path d="M560 160 L560 260 M560 450 L560 620" stroke="url(#pipeGrad)" stroke-width="28" stroke-linecap="round" />
+
+  <!-- Support Steel Framework (Navy Blue) -->
+  <rect x="420" y="470" width="28" height="230" fill="#1E3A8A" />
+  <rect x="620" y="470" width="28" height="230" fill="#1E3A8A" />
+  <rect x="400" y="520" width="270" height="24" fill="#1E3A8A" />
+
+  <!-- Industrial Inspector Silhouette / Figure -->
+  <g transform="translate(40, 200)">
+    <!-- Back & Torso -->
+    <path d="M20 500 L20 290 Q40 240 100 220 Q160 210 200 240 L260 300 L220 500 Z" fill="url(#jacketGrad)" />
+    
+    <!-- Reflective High-Vis Strip on Jacket -->
+    <path d="M30 330 Q100 310 180 320 L185 338 Q100 328 30 348 Z" fill="#94A3B8" />
+
+    <!-- Arm & Hand Holding Clipboard -->
+    <path d="M160 260 Q200 320 230 390 Q220 410 190 390 Q170 330 140 290 Z" fill="url(#jacketGrad)" />
+    
+    <!-- Hand & Pen -->
+    <circle cx="215" cy="400" r="14" fill="#FBCFE8" />
+    <path d="M210 390 L228 375" stroke="#334155" stroke-width="5" stroke-linecap="round" />
+
+    <!-- Clipboard & Technical Inspection Paper -->
+    <g transform="translate(190, 360) rotate(-15)">
+      <rect x="0" y="0" width="95" height="135" rx="6" fill="#1E3A8A" />
+      <rect x="15" y="-8" width="65" height="16" rx="4" fill="#64748B" />
+      <rect x="8" y="10" width="79" height="115" rx="3" fill="#F8FAFC" />
+      <!-- Document Text Lines -->
+      <line x1="16" y1="26" x2="65" y2="26" stroke="#00607A" stroke-width="4" stroke-linecap="round" />
+      <line x1="16" y1="40" x2="78" y2="40" stroke="#94A3B8" stroke-width="2.5" />
+      <line x1="16" y1="52" x2="72" y2="52" stroke="#94A3B8" stroke-width="2.5" />
+      <line x1="16" y1="64" x2="76" y2="64" stroke="#94A3B8" stroke-width="2.5" />
+      <line x1="16" y1="76" x2="60" y2="76" stroke="#94A3B8" stroke-width="2.5" />
+      <line x1="16" y1="88" x2="74" y2="88" stroke="#94A3B8" stroke-width="2.5" />
+      <!-- Checkbox marks -->
+      <circle cx="22" cy="102" r="3" fill="#00607A" />
+      <line x1="30" y1="102" x2="68" y2="102" stroke="#94A3B8" stroke-width="2.5" />
+    </g>
+
+    <!-- Head, Neck & Safety Gear in Profile -->
+    <!-- Neck -->
+    <path d="M120 180 L155 180 L165 230 L115 230 Z" fill="#FBCFE8" />
+    <!-- Collar -->
+    <path d="M110 220 L160 215 L175 245 L115 245 Z" fill="#0F172A" />
+    <!-- Face / Ear in Profile -->
+    <path d="M125 130 Q165 130 160 175 Q150 195 130 190 Q115 185 120 145 Z" fill="#FBCFE8" />
+    <circle cx="138" cy="165" r="7" fill="#F472B6" opacity="0.6" />
+    <!-- Safety Glasses Frame & Lens -->
+    <path d="M135 145 Q160 145 170 152 Q160 160 140 158 Z" fill="#0284C7" fill-opacity="0.35" stroke="#334155" stroke-width="2" />
+    <!-- White Safety Hardhat -->
+    <path d="M95 140 Q105 75 165 80 Q195 95 190 135 L85 145 Z" fill="url(#helmetGrad)" />
+    <!-- Hardhat Brim & Adjustment Strap -->
+    <path d="M80 142 L198 132" stroke="#94A3B8" stroke-width="6" stroke-linecap="round" />
+    <rect x="100" y="145" width="22" height="10" rx="3" fill="#1E293B" />
+  </g>
+</svg>

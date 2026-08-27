@@ -1,0 +1,6 @@
+{
+  "name": "ECASEURO",
+  "description": "B2B certification, inspection, training and assurance organisation technical foundation and design system.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

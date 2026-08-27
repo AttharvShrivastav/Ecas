@@ -1,0 +1,255 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* Confirmed Brand Elements */
+    --brand-teal: #00607A;
+    --brand-navy: #032E64;
+    
+    /* Confirmed Semantic Gradients */
+    --gradient-hero: linear-gradient(135deg, #00607A 0%, #032E64 100%);
+    --gradient-nav-cta: linear-gradient(135deg, #0B1642 0%, #3261BC 100%);
+    --gradient-cta: linear-gradient(135deg, #0F1B4A 0%, #6B96CC 100%);
+    --gradient-about-support: linear-gradient(90deg, #DCDEFA 2%, #F2F5FB 100%);
+    --gradient-certification-process: linear-gradient(135deg, #F9F8FA 22%, #90B3F0 100%);
+    --gradient-testimonial-default: linear-gradient(135deg, #F2F5FB 0%, #F0F1FC 100%);
+    --gradient-testimonial-hover: linear-gradient(135deg, #F2F5FB 0%, #DCDEFA 100%);
+    
+    /* Confirmed FAQ Section Badge Fill */
+    --faq-badge-bg: rgba(144, 179, 240, 0.21);
+    --faq-card-bg: #F5F7FC;
+    
+    /* Confirmed Global Page Background */
+    --bg-page: #EEEEEE;
+    
+    /* Development Scaffolding Variables (to be confirmed from Figma frames) */
+    --surface-white: #FFFFFF;
+    --surface-neutral: #F1F4F7;
+    --surface-neutral-subtle: #E8EEF3;
+    --border-subtle: #E2E8F0;
+    --border-neutral: #CBD5E1;
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-muted: #64748B;
+    --text-inverse: #FFFFFF;
+  }
+
+  html {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+  }
+
+  body {
+    min-height: 100vh;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/*
+  Hero-Specific Gradient Utility
+  Confirmed upper-left #00607A to lower-right #032E64 diagonal gradient.
+  Strictly for Hero sections, not for general cards or buttons.
+*/
+.bg-hero-gradient {
+  background: var(--gradient-hero);
+}
+
+/*
+  Navbar CTA Gradient Utility
+  Confirmed #0B1642 -> #3261BC gradient for Navbar Verify Certificate button.
+*/
+.bg-nav-cta-gradient {
+  background: var(--gradient-nav-cta);
+}
+
+/*
+  Large CTA / Banner Surface Gradient Utility
+  Confirmed #0F1B4A -> #6B96CC gradient for approved CTA banner sections.
+*/
+.bg-cta-gradient {
+  background: var(--gradient-cta);
+}
+
+/*
+  About Support Strip Gradient Utility
+  Confirmed #DCDEFA (2%) -> #F2F5FB (100%) horizontal linear gradient.
+*/
+.bg-about-support-gradient {
+  background: var(--gradient-about-support);
+}
+
+/*
+  Certification Process Panel Gradient Utility
+  Confirmed #F9F8FA (22%) -> #90B3F0 (100%) diagonal gradient.
+*/
+.bg-process-panel-gradient {
+  background: var(--gradient-certification-process);
+}
+
+/*
+  Code-based Hero Noise / Grain Utility
+  Figma Settings:
+  - Mono noise
+  - Density: 100%
+  - Color: #000000
+  - Opacity: 25%
+*/
+.noise-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  opacity: 0.25;
+  mix-blend-mode: multiply;
+}
+
+/* Fluid Typography Utilities (DM Sans) */
+.text-display {
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(2.25rem, 5vw + 1rem, 3.75rem);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.text-h1 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(1.875rem, 3.5vw + 0.5rem, 2.75rem);
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.text-h2 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(1.5rem, 2.5vw + 0.25rem, 2.125rem);
+  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.text-h3 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(1.25rem, 1.5vw + 0.25rem, 1.5rem);
+  line-height: 1.35;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.text-body {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  line-height: 1.625;
+  font-weight: 400;
+}
+
+.text-body-sm {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.text-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.text-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* Accessible focus ring */
+.focus-ring {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+.focus-ring:focus-visible {
+  outline: 2px solid #00607A;
+  outline-offset: 2px;
+}
+
+/*
+  Global Layout Container Utility
+  Provides responsive gutters and generous wide-screen footprint on xl and 2xl breakpoints.
+  Reduces outer margins by ~50% on expanded desktop displays while preserving clean outer breathing room.
+*/
+.site-container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .site-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .site-container {
+    max-width: 1380px;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .site-container {
+    max-width: 1600px;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+@media (min-width: 1536px) {
+  .site-container {
+    max-width: 1720px;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}
+
+/* Continuous Industry Icon Marquee */
+@keyframes industryMarqueeScroll {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.industry-marquee-track {
+  display: flex;
+  width: max-content;
+  align-items: center;
+  animation: industryMarqueeScroll 28s linear infinite;
+  will-change: transform;
+}
+
+.industry-marquee-track:hover,
+.industry-marquee-track:focus-within {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .industry-marquee-track {
+    animation: none !important;
+    transform: none !important;
+  }
+}
