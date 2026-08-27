@@ -44,6 +44,9 @@ export const ContactPage: React.FC<ContactPageProps> = ({
         headingLines={content.hero.headingLines}
         description={content.hero.description}
         ariaLabel="Contact Hero"
+        visualSrc="/images/contact/contact-hero.webp"
+        visualAlt="Global contact and communication network"
+        visualPosition="home-globe"
       />
 
       {/* 2. Main Asymmetric Contact Section */}

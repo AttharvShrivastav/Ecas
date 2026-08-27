@@ -124,7 +124,7 @@ export const AdminLoginPage: React.FC = () => {
                 </span>
               </div>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-[#082046] tracking-tight font-['Space_Grotesk']">
+            <h1 className="text-xl sm:text-2xl font-bold text-[#082046] tracking-tight">
               Sign In to Admin
             </h1>
             <p className="text-xs sm:text-sm text-[#64748B] mt-1">

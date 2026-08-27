@@ -49,7 +49,7 @@ export const HomeServicesSection: React.FC<HomeServicesSectionProps> = ({
             </p>
 
             {/* Inset Explore All Services CTA (Right-aligned in upper-right column per Figma) */}
-            <div className="mt-5 sm:mt-6 flex justify-start lg:justify-end">
+            <div className="mt-5 sm:mt-6 flex justify-start lg:justify-start">
               <Button
                 href={content.cta.href}
                 variant={content.cta.variant === 'secondary' ? 'secondary' : 'primary'}

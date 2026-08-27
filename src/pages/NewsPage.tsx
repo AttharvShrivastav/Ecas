@@ -101,6 +101,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
         headingLines={content.hero.headingLines}
         description={content.hero.description}
         ariaLabel="News and insights header"
+        heroVariant = "compact"
       />
 
       {/* 2. Main Content Container */}

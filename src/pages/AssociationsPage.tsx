@@ -93,6 +93,9 @@ export const AssociationsPage: React.FC<AssociationsPageProps> = ({
         headingLines={content.hero.headingLines}
         description={content.hero.description}
         ariaLabel="Associations Hero"
+        visualSrc="/images/associations/associations-hero.webp"
+        visualAlt="Global associations and professional network"
+        visualPosition="home-globe"
       />
 
       {/* Intro & Contextual Statement */}
