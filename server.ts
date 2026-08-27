@@ -12,7 +12,7 @@ import { getDatabase } from './src/server/db/database';
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT) || 3000;
 
   // Mount Better Auth handler BEFORE express.json()
   app.all('/api/auth/*', toNodeHandler(auth));
