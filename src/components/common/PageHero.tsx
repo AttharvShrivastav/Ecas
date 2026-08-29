@@ -120,10 +120,10 @@ export const PageHero: React.FC<PageHeroProps> = ({
   let defaultVisualWrapperClass = '';
   if (visualPosition === 'home-globe') {
     defaultVisualWrapperClass =
-      'absolute -bottom-14 -right-12 sm:-bottom-16 sm:-right-14 md:-bottom-18 md:-right-14 lg:-bottom-20 lg:-right-16 xl:-bottom-22 xl:-right-18 2xl:-bottom-26 2xl:-right-22 w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] md:w-[500px] md:h-[500px] lg:w-[580px] lg:h-[580px] xl:w-[680px] xl:h-[680px] 2xl:w-[740px] 2xl:h-[740px] pointer-events-none select-none z-10 flex items-center justify-center';
+    'absolute -bottom-8 -right-8 w-[240px] h-[240px] sm:-bottom-16 sm:-right-14 sm:w-[460px] sm:h-[460px] md:w-[500px] md:h-[500px] lg:-bottom-20 lg:-right-16 lg:w-[580px] lg:h-[580px] xl:-bottom-22 xl:-right-18 xl:w-[680px] xl:h-[680px] 2xl:-bottom-26 2xl:-right-22 2xl:w-[740px] 2xl:h-[740px] pointer-events-none select-none z-10 flex items-center justify-center';
   } else if (visualPosition === 'about-map') {
     defaultVisualWrapperClass =
-      'absolute -top-6 sm:-top-8 lg:-top-10 -right-8 sm:-right-12 lg:-right-14 xl:-right-16 w-[340px] sm:w-[480px] md:w-[600px] lg:w-[700px] xl:w-[780px] 2xl:w-[840px] pointer-events-none select-none z-10 flex items-center justify-end';
+    'absolute bottom-0 right-0 h-[300px] w-[320px] sm:h-auto sm:-top-8 sm:bottom-auto sm:-right-12 sm:w-[480px] md:w-[600px] lg:-top-10 lg:-right-14 lg:w-[700px] xl:-right-16 xl:w-[780px] 2xl:w-[840px] pointer-events-none select-none z-10 flex items-end justify-end';
   }
 
   const finalVisualWrapperClass = visualClassName || defaultVisualWrapperClass;
@@ -136,8 +136,8 @@ export const PageHero: React.FC<PageHeroProps> = ({
         aria-label={ariaLabel}
         className={`relative w-full max-w-[1380px] xl:max-w-[1600px] 2xl:max-w-[1720px] mx-auto bg-hero-gradient rounded-2xl sm:rounded-3xl lg:rounded-[32px] overflow-hidden text-white pt-3 sm:pt-4 ${
           heroVariant === 'compact'
-            ? 'pb-12 sm:pb-16 md:pb-20 lg:pb-24 xl:pb-28 2xl:pb-32 min-h-[420px] sm:min-h-[470px] md:min-h-[520px] lg:min-h-[560px] xl:min-h-[600px] 2xl:min-h-[630px]'
-            : 'pb-16 sm:pb-24 md:pb-32 lg:pb-40 xl:pb-48 2xl:pb-52 min-h-[520px] sm:min-h-[580px] md:min-h-[640px] lg:min-h-[700px] xl:min-h-[750px] 2xl:min-h-[790px]'
+            ? 'pb-12 sm:pb-16 md:pb-20 lg:pb-20 xl:pb-24 min-h-[420px] sm:min-h-[470px] md:min-h-[520px] lg:min-h-[560px]'
+            : 'pb-12 sm:pb-20 md:pb-24 lg:pb-24 xl:pb-28 min-h-[440px] sm:min-h-[560px] md:min-h-[600px] lg:min-h-0 lg:h-[calc(100vh-64px)] lg:max-h-[760px]'
         }`}
       >
         {/* Confirmed Procedural Grain / Noise Overlay */}
@@ -181,7 +181,8 @@ export const PageHero: React.FC<PageHeroProps> = ({
               {/* Supporting Secondary Copy */}
               <p
                 ref={descRef}
-                className="mt-6 sm:mt-8 max-w-xl lg:max-w-[480px] xl:max-w-[560px] 2xl:max-w-[620px] text-sm sm:text-[15px] lg:text-base text-white/85 font-normal leading-relaxed tracking-normal"
+                  className="hidden sm:block mt-6 sm:mt-8 max-w-xl lg:max-w-[480px] xl:max-w-[560px] 2xl:max-w-[620px] text-sm sm:text-[15px] lg:text-base text-white/85 font-normal leading-relaxed tracking-normal"
+
               >
                 {description}
               </p>
@@ -205,7 +206,9 @@ export const PageHero: React.FC<PageHeroProps> = ({
               <img
                 src={visualSrc}
                 alt={visualAlt}
-                className="w-full h-full object-contain object-right"
+                draggable={false}
+                decoding="async"
+                className="w-full h-full object-contain object-right select-none"
                 onError={() => setAssetError(true)}
               />
             ) : (
