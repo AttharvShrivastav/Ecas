@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { DATABASE_DIR as DB_DIR, DATABASE_FILE as DB_FILE, HAS_EXPLICIT_DATABASE_PATH } from '../config/storagePaths';
 import { DatabaseSync } from 'node:sqlite';
 import initialCertificates from '../data/initialCertificates.json';
 import { CertificateStatus } from '../types/certificate';
@@ -18,8 +19,6 @@ import { defaultTrainingPageContent } from '../../cms/trainingContent';
 
 let dbInstance: any = null;
 
-const DB_DIR = path.resolve(process.cwd(), 'data');
-const DB_FILE = path.join(DB_DIR, 'ecaseuro.db');
 
 /**
  * Returns the underlying SQLite DatabaseSync instance.
@@ -56,18 +55,25 @@ export function getSqliteDatabase(): DatabaseSync {
 
   if (!isHealthy) {
     if (fs.existsSync(DB_FILE)) {
-      const backupCorrupt = path.join(DB_DIR, `ecaseuro.db.corrupt.${Date.now()}.bak`);
-      try {
-        fs.copyFileSync(DB_FILE, backupCorrupt);
-        fs.unlinkSync(DB_FILE);
-        if (fs.existsSync(DB_FILE + '-wal')) fs.unlinkSync(DB_FILE + '-wal');
-        if (fs.existsSync(DB_FILE + '-shm')) fs.unlinkSync(DB_FILE + '-shm');
-        console.log(`[eCAS Euro DB] Preserved corrupt database at ${backupCorrupt} and initialized fresh database.`);
-      } catch (backupErr) {
-        console.error('[eCAS Euro DB] Error isolating corrupt file:', backupErr);
-      }
+      // Production safety: never delete, rename, replace, or recreate an
+      // existing database after an integrity/open failure. Failing closed
+      // preserves the original DB, WAL, and SHM files for recovery.
+      throw new Error(
+        `[eCAS Euro DB] Refusing to replace existing database after integrity/open failure: ${DB_FILE}`
+      );
     }
 
+    // When DATABASE_PATH is explicitly configured (production), a missing
+    // database usually means the persistent mount/path is wrong. Refuse to
+    // silently create a fresh empty production database.
+    if (HAS_EXPLICIT_DATABASE_PATH) {
+      throw new Error(
+        `[eCAS Euro DB] Configured DATABASE_PATH does not exist: ${DB_FILE}`
+      );
+    }
+
+    // Local development fallback: create a new DB only when no explicit
+    // production database path has been configured.
     rawDb = new DatabaseSync(DB_FILE);
   }
 

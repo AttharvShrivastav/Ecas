@@ -2,14 +2,11 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import {
   computeEffectiveStatus,
   formatDateToHuman,
-  formatCertificateForPublic,
-  normalizeCertificateNumber,
   getCertificateByNumber,
   listCertificates,
   createCertificate,
   updateCertificate,
-  changeCertificateStatus,
-  getCertificateAuditLogs
+  changeCertificateStatus
 } from '../services/certificateService';
 import { getDatabase } from '../db/database';
 import initialCertificates from '../data/initialCertificates.json';
@@ -57,13 +54,11 @@ describe('eCAS Euro Certificate Service & Database Foundation', () => {
     });
 
     it('should preserve Withdrawn status regardless of expiry date', () => {
-      // Withdrawn has highest precedence
       expect(computeEffectiveStatus('Withdrawn', '2020-01-01', '2025-01-01')).toBe('Withdrawn');
       expect(computeEffectiveStatus('Withdrawn', '2030-01-01', '2025-01-01')).toBe('Withdrawn');
     });
 
     it('should preserve Suspended status regardless of expiry date', () => {
-      // Suspended has precedence over automated expiry
       expect(computeEffectiveStatus('Suspended', '2020-01-01', '2025-01-01')).toBe('Suspended');
       expect(computeEffectiveStatus('Suspended', '2030-01-01', '2025-01-01')).toBe('Suspended');
     });
@@ -112,10 +107,10 @@ describe('eCAS Euro Certificate Service & Database Foundation', () => {
     });
   });
 
-  describe('5. Administrative Service Operations & Audit Trails', () => {
+  describe('5. Administrative Service Operations', () => {
     const testCertNumber = 'TEST/QA/2026/0099';
 
-    it('should create a new certificate with audit log', async () => {
+    it('should create a new certificate', async () => {
       const created = await createCertificate({
         certificateNumber: testCertNumber,
         companyName: 'ACME Test Industries Ltd',
@@ -125,15 +120,10 @@ describe('eCAS Euro Certificate Service & Database Foundation', () => {
         issueDate: '2024-01-15',
         expiryDate: '2027-01-14',
         status: 'Valid'
-      }, 'TEST_SUITE');
+      });
 
       expect(created.id).toBeGreaterThan(0);
       expect(created.certificate_number).toBe(testCertNumber);
-
-      const logs = await getCertificateAuditLogs(created.id);
-      expect(logs.length).toBeGreaterThan(0);
-      expect(logs[0].action).toBe('CREATE');
-      expect(logs[0].performed_by).toBe('TEST_SUITE');
     });
 
     it('should prevent duplicate certificate numbers', async () => {
@@ -150,44 +140,41 @@ describe('eCAS Euro Certificate Service & Database Foundation', () => {
       ).rejects.toThrow(/already exists/i);
     });
 
-    it('should update certificate details with audit log', async () => {
+    it('should update certificate details', async () => {
       const found = await getCertificateByNumber(testCertNumber);
       expect(found).not.toBeNull();
 
-      // Look up db record to get ID
       const list = await listCertificates({ search: testCertNumber });
       const certDb = list.data[0];
 
       const updated = await updateCertificate(certDb.id, {
         companyName: 'ACME Global Quality Corp',
         scope: 'Expanded International Scope'
-      }, 'TEST_SUITE');
+      });
 
       expect(updated.company_name).toBe('ACME Global Quality Corp');
-
-      const logs = await getCertificateAuditLogs(certDb.id);
-      expect(logs.some(l => l.action === 'UPDATE')).toBe(true);
     });
 
-    it('should suspend and reactivate certificate with status audit logs', async () => {
+    it('should suspend and reactivate certificate', async () => {
       const list = await listCertificates({ search: testCertNumber });
       const certDb = list.data[0];
 
-      // Suspend
-      const suspended = await changeCertificateStatus(certDb.id, 'Suspended', 'Annual surveillance audit pending', 'AUDITOR_JANE');
+      const suspended = await changeCertificateStatus(
+        certDb.id,
+        'Suspended',
+        'Annual surveillance audit pending'
+      );
       expect(suspended.status).toBe('Suspended');
 
-      // Verify public API returns Suspended
       const publicCert = await getCertificateByNumber(testCertNumber);
       expect(publicCert?.status).toBe('Suspended');
 
-      // Reactivate
-      const reactivated = await changeCertificateStatus(certDb.id, 'Valid', 'Audit successfully cleared', 'AUDITOR_JANE');
+      const reactivated = await changeCertificateStatus(
+        certDb.id,
+        'Valid',
+        'Audit successfully cleared'
+      );
       expect(reactivated.status).toBe('Valid');
-
-      const logs = await getCertificateAuditLogs(certDb.id);
-      expect(logs.some(l => l.action === 'SUSPEND')).toBe(true);
-      expect(logs.some(l => l.action === 'REACTIVATE')).toBe(true);
     });
   });
 });

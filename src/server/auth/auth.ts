@@ -8,9 +8,6 @@ import { getSqliteDatabase } from '../db/database';
 const DEFAULT_SECRET = 'ecaseuro-system-admin-auth-secret-key-2024-secure';
 const secret = process.env.BETTER_AUTH_SECRET || DEFAULT_SECRET;
 
-/**
- * Safely extracts the hostname from a URL string if valid.
- */
 function extractHost(urlStr?: string): string {
   if (!urlStr) return '';
   try {

@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
+import { CMS_UPLOAD_DIR } from '../config/storagePaths';
 import multer from 'multer';
 import {
   getPageByKey,
@@ -19,7 +20,7 @@ import {
 // ---------------------------------------------------------------------------
 // CMS Image Upload Setup (Dedicated Directory & Collision-Safe Naming)
 // ---------------------------------------------------------------------------
-const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'cms');
+const UPLOAD_DIR = CMS_UPLOAD_DIR;
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }

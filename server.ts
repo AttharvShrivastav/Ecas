@@ -9,6 +9,7 @@ import { publicEnquiryRouter, adminEnquiryRouter } from './src/server/routes/enq
 import { publicCmsRouter, adminCmsRouter } from './src/server/routes/cmsRoutes';
 import { adminAccountRouter } from './src/server/routes/accountRoutes';
 import { getDatabase } from './src/server/db/database';
+import { DATABASE_FILE, UPLOADS_DIR } from './src/server/config/storagePaths';
 
 async function startServer() {
   const app = express();
@@ -20,13 +21,18 @@ async function startServer() {
   // JSON Body Parser for other API endpoints
   app.use(express.json());
 
-  // Initialize persistent SQLite database & auto-seed client records and admin user
+  // Initialize persistent SQLite database & verify admin auth.
+  // Fail startup if persistent state cannot be opened safely.
   try {
     await getDatabase();
     await ensureAdminUser();
     console.log('[eCAS Euro] Database & Admin Auth initialized and verified.');
+    console.log('[eCAS Euro] Database file:', DATABASE_FILE);
+    console.log('[eCAS Euro] Uploads directory:', UPLOADS_DIR);
   } catch (dbErr) {
-    console.error('[eCAS Euro] Database initialization error:', dbErr);
+    console.error('[eCAS Euro] Fatal database/auth initialization error:', dbErr);
+    process.exitCode = 1;
+    return;
   }
 
   // Health Check
@@ -45,8 +51,7 @@ async function startServer() {
   app.use('/api/cms', publicCmsRouter);
 
   // Public Uploads Static Serving (CMS Assets)
-  const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-  app.use('/uploads', express.static(uploadsDir));
+  app.use('/uploads', express.static(UPLOADS_DIR));
 
   // Administrative API Protection Middleware
   app.use('/api/admin', requireAdminSession);
@@ -78,4 +83,3 @@ async function startServer() {
 }
 
 startServer();
-

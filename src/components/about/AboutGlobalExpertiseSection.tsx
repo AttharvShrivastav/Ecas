@@ -16,276 +16,913 @@ import {
   FirstAid,
 } from '@phosphor-icons/react';
 import { defaultAboutGlobalExpertiseContent } from '../../cms/aboutContent';
-import type {
-  AboutGlobalExpertiseContent,
-  IndustryItem,
-} from '../../cms/types';
-import { gsap, ScrollTrigger, prefersReducedMotion } from '../../animations/gsap';
+import type { AboutGlobalExpertiseContent } from '../../cms/types';
+import { gsap, prefersReducedMotion } from '../../animations/gsap';
 
 export interface AboutGlobalExpertiseSectionProps {
   content?: AboutGlobalExpertiseContent;
 }
 
-/**
- * Safe icon mapper for industry keys to Phosphor Icons
- */
+/* =========================================================
+   INDUSTRY ICON MAPPER
+   ========================================================= */
+
 const getIndustryIcon = (iconKey: string) => {
   switch (iconKey.toLowerCase()) {
     case 'oil-gas':
     case 'oil':
     case 'gas':
       return ShieldPlus;
+
     case 'power':
     case 'energy':
       return ChatTeardropText;
+
     case 'mining':
     case 'tech':
     case 'technology':
     case 'monitor':
     case 'desktop':
       return Desktop;
+
     case 'construction':
       return Briefcase;
+
     case 'chemical':
     case 'pharma':
     case 'pill':
       return Pill;
+
     case 'food':
     case 'agriculture':
       return MapPin;
+
     case 'engineering':
       return Gear;
+
     case 'flame':
       return Flame;
+
     case 'lightning':
       return Lightning;
+
     case 'hardhat':
       return HardHat;
+
     case 'flask':
       return Flask;
+
     case 'forkknife':
       return ForkKnife;
+
     case 'firstaid':
       return FirstAid;
+
     default:
       return ShieldCheck;
   }
 };
 
-/**
- * Approved ECASEURO About "Global Expertise, Local Understanding" Section
- *
- * Source of Truth: Approved Figma Desktop Composition & Specifications
- * - Top Row:
- *   - Left: Semantic Display H2 ("Global Expertise,\nLocal Understanding")
- *   - Right: Supporting paragraph
- * - 2-Column Asymmetric Capability Collage:
- *   - Left Column:
- *     - Card 01: 10+ Countries (Headline, subtitle, copy + wireframe globe SVG + layered HTML country pills)
- *     - Card 02: Worldwide (Headline, subtitle, copy + bottom WebP photo)
- *   - Right Column:
- *     - Card 03: 15+ Offices (Upper orbit SVG diagram with assessor node + headline, subtitle, copy)
- *     - Card 04: Multiple (Upper blue horizontal industry icon strip with active/hover states + headline, subtitle, copy)
- * - Desktop-Only Scroll-Linked Alignment:
- *   - Right column begins approx 75px lower than its final aligned position
- *   - Smoothly translates upward tied to scroll progress via GSAP ScrollTrigger (scrub: 1)
- *   - Ends with both columns vertically aligned
- *   - No scroll offset or transform on tablet/mobile (< 1024px)
- *   - Opacity-only entrance sequence
- *   - Restrained 12px-16px card radii
- */
+/* =========================================================
+   COUNTRY FLAGS
+   ========================================================= */
+
+const getCountryFlag = (country: string) => {
+  const key = country.trim().toLowerCase();
+
+  const flags: Record<string, string> = {
+    oman: '/images/flags/oman.svg',
+    qatar: '/images/flags/qatar.svg',
+    belgium: '/images/flags/belgium.svg',
+    india: '/images/flags/india.svg',
+  };
+
+  return flags[key];
+};
+
+/* =========================================================
+   COMPONENT
+   ========================================================= */
+
 export const AboutGlobalExpertiseSection: React.FC<
   AboutGlobalExpertiseSectionProps
 > = ({ content = defaultAboutGlobalExpertiseContent }) => {
   const sectionRef = useRef<HTMLElement | null>(null);
+
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   const descRef = useRef<HTMLParagraphElement | null>(null);
+
   const leftColRef = useRef<HTMLDivElement | null>(null);
   const rightColRef = useRef<HTMLDivElement | null>(null);
 
-  // Industry strip active item state
-  const industryItems = content.industries.items;
-  const defaultActiveIndustryId = industryItems[2]?.id || industryItems[0]?.id || 'mining';
-  const [activeIndustryId, setActiveIndustryId] = useState<string>(defaultActiveIndustryId);
+  /*
+   * Marquee refs
+   *
+   * viewport = clipped visible blue strip
+   * track    = element GSAP translates
+   * set      = first complete icon sequence whose width we measure
+   */
+  const marqueeViewportRef = useRef<HTMLDivElement | null>(null);
+  const marqueeTrackRef = useRef<HTMLDivElement | null>(null);
+  const marqueeSetRef = useRef<HTMLDivElement | null>(null);
 
-  // Coordinate mapping for the 4 country pills over the globe SVG
+  const industryItems = content.industries.items;
+
+  const defaultActiveIndustryId =
+    industryItems[2]?.id ||
+    industryItems[0]?.id ||
+    'mining';
+
+  const [activeIndustryId, setActiveIndustryId] = useState<string>(
+    defaultActiveIndustryId
+  );
+
+  /* =========================================================
+     COUNTRY POSITIONS
+     ========================================================= */
+
   const countryPositions = [
-    { top: '16%', left: '8%' },
-    { top: '14%', right: '10%' },
-    { bottom: '34%', left: '15%' },
-    { bottom: '20%', right: '10%' },
+    {
+      top: '16%',
+      left: '8%',
+    },
+    {
+      top: '14%',
+      right: '10%',
+    },
+    {
+      bottom: '34%',
+      left: '15%',
+    },
+    {
+      bottom: '20%',
+      right: '10%',
+    },
   ];
 
-  // GSAP Entrance (opacity-only) + Desktop Scroll-Linked Right Column Alignment
+  /* =========================================================
+     ENTRANCE + RIGHT COLUMN SCROLL ALIGNMENT
+     ========================================================= */
+
   useEffect(() => {
     if (!sectionRef.current || prefersReducedMotion()) {
       return;
     }
 
     const ctx = gsap.context(() => {
-      // 1. Entrance animation (opacity-only)
+      /* Entrance */
       const entranceTl = gsap.timeline({
         scrollTrigger: {
           trigger: sectionRef.current,
           start: 'top 80%',
           once: true,
         },
-        defaults: { ease: 'power2.out' },
+        defaults: {
+          ease: 'power2.out',
+        },
       });
 
       if (headingRef.current) {
-        entranceTl.fromTo(headingRef.current, { opacity: 0 }, { opacity: 1, duration: 0.5 });
-      }
-      if (descRef.current) {
-        entranceTl.fromTo(descRef.current, { opacity: 0 }, { opacity: 1, duration: 0.45 }, '-=0.3');
-      }
-      if (leftColRef.current) {
-        entranceTl.fromTo(leftColRef.current, { opacity: 0 }, { opacity: 1, duration: 0.5 }, '-=0.25');
-      }
-      if (rightColRef.current) {
-        entranceTl.fromTo(rightColRef.current, { opacity: 0 }, { opacity: 1, duration: 0.5 }, '-=0.35');
+        entranceTl.fromTo(
+          headingRef.current,
+          {
+            opacity: 0,
+          },
+          {
+            opacity: 1,
+            duration: 0.5,
+          }
+        );
       }
 
-      // 2. Desktop-Only Scroll-Linked Right Column Alignment Interaction
+      if (descRef.current) {
+        entranceTl.fromTo(
+          descRef.current,
+          {
+            opacity: 0,
+          },
+          {
+            opacity: 1,
+            duration: 0.45,
+          },
+          '-=0.3'
+        );
+      }
+
+      if (leftColRef.current) {
+        entranceTl.fromTo(
+          leftColRef.current,
+          {
+            opacity: 0,
+          },
+          {
+            opacity: 1,
+            duration: 0.5,
+          },
+          '-=0.25'
+        );
+      }
+
+      if (rightColRef.current) {
+        entranceTl.fromTo(
+          rightColRef.current,
+          {
+            opacity: 0,
+          },
+          {
+            opacity: 1,
+            duration: 0.5,
+          },
+          '-=0.35'
+        );
+      }
+
+      /* Desktop asymmetric column motion */
       const mm = gsap.matchMedia();
 
       mm.add('(min-width: 1024px)', () => {
-        if (rightColRef.current && sectionRef.current) {
-          gsap.fromTo(
-            rightColRef.current,
-            { y: 75 },
-            {
-              y: 0,
-              ease: 'none',
-              scrollTrigger: {
-                trigger: sectionRef.current,
-                start: 'top 75%',
-                end: 'center 45%',
-                scrub: 1,
-              },
-            }
-          );
+        if (!rightColRef.current || !sectionRef.current) {
+          return;
         }
+
+        gsap.fromTo(
+          rightColRef.current,
+          {
+            y: 75,
+          },
+          {
+            y: 0,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 75%',
+              end: 'center 45%',
+              scrub: 1,
+            },
+          }
+        );
       });
+
+      return () => {
+        mm.revert();
+      };
     }, sectionRef);
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+    };
   }, []);
+
+  /* =========================================================
+     GSAP INFINITE INDUSTRY MARQUEE
+     ========================================================= */
+
+  useEffect(() => {
+    const viewport = marqueeViewportRef.current;
+    const track = marqueeTrackRef.current;
+    const firstSet = marqueeSetRef.current;
+
+    if (
+      !viewport ||
+      !track ||
+      !firstSet ||
+      industryItems.length === 0
+    ) {
+      return;
+    }
+
+    if (prefersReducedMotion()) {
+      gsap.set(track, {
+        x: 0,
+      });
+
+      return;
+    }
+
+    let marqueeTween: gsap.core.Tween | null = null;
+    let resizeObserver: ResizeObserver | null = null;
+
+    let rebuildTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const buildMarquee = () => {
+      if (!track || !firstSet) return;
+
+      marqueeTween?.kill();
+      marqueeTween = null;
+
+      gsap.set(track, {
+        x: 0,
+      });
+
+      /*
+       * Because Set 2 is an exact duplicate of Set 1,
+       * translating exactly the width of Set 1 gives us
+       * a mathematically seamless loop.
+       */
+      const setWidth = firstSet.getBoundingClientRect().width;
+
+      if (setWidth <= 0) {
+        return;
+      }
+
+      /*
+       * Approximate marquee speed:
+       * 45 px per second.
+       *
+       * Smaller number = slower.
+       * Larger number = faster.
+       */
+      const pixelsPerSecond = 45;
+      const duration = setWidth / pixelsPerSecond;
+
+      marqueeTween = gsap.fromTo(
+        track,
+        {
+          x: 0,
+        },
+        {
+          x: -setWidth,
+          duration,
+          ease: 'none',
+          repeat: -1,
+        }
+      );
+    };
+
+    /*
+     * Wait for layout to settle before measuring.
+     */
+    const frame = requestAnimationFrame(() => {
+      buildMarquee();
+    });
+
+    /*
+     * Re-measure if responsive layout changes.
+     */
+    resizeObserver = new ResizeObserver(() => {
+      if (rebuildTimer) {
+        clearTimeout(rebuildTimer);
+      }
+
+      rebuildTimer = setTimeout(() => {
+        buildMarquee();
+      }, 100);
+    });
+
+    resizeObserver.observe(firstSet);
+
+    /* Pause interaction */
+    const pauseMarquee = () => {
+      marqueeTween?.pause();
+    };
+
+    const resumeMarquee = () => {
+      marqueeTween?.resume();
+    };
+
+    viewport.addEventListener('pointerenter', pauseMarquee);
+    viewport.addEventListener('pointerleave', resumeMarquee);
+
+    viewport.addEventListener('focusin', pauseMarquee);
+    viewport.addEventListener('focusout', resumeMarquee);
+
+    return () => {
+      cancelAnimationFrame(frame);
+
+      if (rebuildTimer) {
+        clearTimeout(rebuildTimer);
+      }
+
+      resizeObserver?.disconnect();
+
+      viewport.removeEventListener(
+        'pointerenter',
+        pauseMarquee
+      );
+
+      viewport.removeEventListener(
+        'pointerleave',
+        resumeMarquee
+      );
+
+      viewport.removeEventListener(
+        'focusin',
+        pauseMarquee
+      );
+
+      viewport.removeEventListener(
+        'focusout',
+        resumeMarquee
+      );
+
+      marqueeTween?.kill();
+
+      gsap.set(track, {
+        clearProps: 'transform',
+      });
+    };
+  }, [industryItems]);
+
+  /* =========================================================
+     RENDER
+     ========================================================= */
 
   return (
     <section
       ref={sectionRef}
       id="global-expertise"
       aria-label="Global Expertise, Local Understanding"
-      className="w-full py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 bg-[#EEEEEE]"
+      className="
+        w-full
+        bg-[#EEEEEE]
+        px-4
+        py-12
+
+        sm:px-6
+        sm:py-16
+
+        md:py-20
+
+        lg:px-8
+        lg:py-24
+
+        xl:px-10
+
+        2xl:px-12
+      "
     >
-      <div className="w-full max-w-[1380px] xl:max-w-[1560px] 2xl:max-w-[1680px] mx-auto">
-        {/* TOP ROW: Heading & Supporting Copy */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 xl:gap-16 items-start mb-10 sm:mb-12 lg:mb-14">
-          <div className="lg:col-span-6 xl:col-span-6">
+      <div
+        className="
+          mx-auto
+          w-full
+          max-w-[1380px]
+
+          xl:max-w-[1560px]
+
+          2xl:max-w-[1680px]
+        "
+      >
+        {/* =====================================================
+            TOP ROW
+            ===================================================== */}
+
+        <div
+          className="
+            mb-10
+            grid
+            grid-cols-1
+            items-start
+            gap-6
+
+            sm:mb-12
+
+            lg:mb-14
+            lg:grid-cols-12
+            lg:gap-12
+
+            xl:gap-16
+          "
+        >
+          <div className="lg:col-span-6">
             <h2
               ref={headingRef}
-              className="text-3xl sm:text-4xl lg:text-[42px] xl:text-[48px] font-normal leading-[1.12] tracking-[-0.025em] text-[#082046] whitespace-pre-line"
+              className="
+                whitespace-pre-line
+                text-3xl
+                font-normal
+                leading-[1.12]
+                tracking-[-0.025em]
+                text-[#082046]
+
+                sm:text-4xl
+
+                lg:text-[42px]
+
+                xl:text-[48px]
+              "
             >
               {content.heading}
             </h2>
           </div>
 
-          <div className="lg:col-span-6 xl:col-span-6 lg:pt-2 flex justify-start lg:justify-end">
+          <div
+            className="
+              flex
+              justify-start
+
+              lg:col-span-6
+              lg:justify-end
+              lg:pt-2
+            "
+          >
             <p
               ref={descRef}
-              className="text-sm sm:text-base lg:text-[16px] text-slate-600 font-normal leading-relaxed max-w-lg lg:text-right"
+              className="
+                max-w-lg
+                text-sm
+                font-normal
+                leading-relaxed
+                text-slate-600
+
+                sm:text-base
+
+                lg:text-right
+                lg:text-[16px]
+              "
             >
               {content.description}
             </p>
           </div>
         </div>
 
-        {/* 2-COLUMN ASYMMETRIC COLLAGE */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 xl:gap-10 items-start">
-          {/* LEFT COLUMN */}
-          <div ref={leftColRef} className="flex flex-col gap-6 lg:gap-8">
-            {/* CARD 01 — 10+ Countries (Shorter Left-Column Card ~46%) */}
+        {/* =====================================================
+            COLLAGE
+            ===================================================== */}
+
+        <div
+          className="
+            grid
+            grid-cols-1
+            items-start
+            gap-6
+
+            lg:grid-cols-2
+            lg:gap-8
+
+            xl:gap-10
+          "
+        >
+          {/* ===================================================
+              LEFT COLUMN
+              =================================================== */}
+
+          <div
+            ref={leftColRef}
+            className="
+              flex
+              flex-col
+              gap-6
+
+              lg:gap-8
+            "
+          >
+            {/* =================================================
+                CARD 01 — COUNTRIES
+                ================================================= */}
+
             <article
               tabIndex={0}
               role="region"
               aria-label={`${content.countries.headline} - ${content.countries.subtitle}`}
-              className="group relative bg-gradient-to-r from-[#F2F5FB] to-[#DCDEFA] border border-slate-200/80 shadow-xs rounded-xl sm:rounded-2xl p-6 sm:p-7 lg:p-8 flex flex-col justify-between overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-[#032E64] lg:h-[480px] xl:h-[500px]"
+              className="
+                group
+                relative
+                flex
+                flex-col
+                justify-between
+                overflow-hidden
+                rounded-xl
+                border
+                border-slate-200/80
+                bg-gradient-to-r
+                from-[#F2F5FB]
+                to-[#DCDEFA]
+                p-6
+                shadow-xs
+                outline-none
+
+                focus-visible:ring-2
+                focus-visible:ring-[#032E64]
+
+                sm:rounded-2xl
+                sm:p-7
+
+                lg:h-[480px]
+                lg:p-8
+
+                xl:h-[500px]
+              "
             >
-              {/* Top Text Content */}
+              {/* TEXT */}
+
               <div className="relative z-20 shrink-0">
-                <h3 className="text-3xl sm:text-4xl lg:text-[38px] font-normal leading-tight text-[#082046] tracking-tight">
+                <h3
+                  className="
+                    text-3xl
+                    font-normal
+                    leading-tight
+                    tracking-tight
+                    text-[#082046]
+
+                    sm:text-4xl
+
+                    lg:text-[38px]
+                  "
+                >
                   {content.countries.headline}
                 </h3>
-                <h4 className="text-base sm:text-lg font-medium text-[#082046] mt-3 sm:mt-4">
+
+                <h4
+                  className="
+                    mt-3
+                    text-base
+                    font-medium
+                    text-[#082046]
+
+                    sm:mt-4
+                    sm:text-lg
+                  "
+                >
                   {content.countries.subtitle}
                 </h4>
-                <p className="text-xs sm:text-[13.5px] text-slate-600 font-normal leading-relaxed mt-2 max-w-md">
+
+                <p
+                  className="
+                    mt-2
+                    max-w-md
+                    text-xs
+                    font-normal
+                    leading-relaxed
+                    text-slate-600
+
+                    sm:text-[13.5px]
+                  "
+                >
                   {content.countries.description}
                 </p>
+
                 {content.countries.subDescription && (
-                  <p className="text-xs sm:text-[13.5px] text-slate-600 font-normal leading-relaxed">
+                  <p
+                    className="
+                      text-xs
+                      font-normal
+                      leading-relaxed
+                      text-slate-600
+
+                      sm:text-[13.5px]
+                    "
+                  >
                     {content.countries.subDescription}
                   </p>
                 )}
               </div>
 
-              {/* Lower Globe Wireframe Graphic + Layered Country Pills */}
-              <div className="relative w-full flex-1 min-h-[200px] sm:min-h-[220px] lg:min-h-0 flex items-end justify-center pt-4">
-                {/* Globe SVG Graphic */}
+              {/* GLOBE */}
+
+              <div
+                className="
+                  relative
+                  flex
+                  min-h-[200px]
+                  w-full
+                  flex-1
+                  items-end
+                  justify-center
+                  pt-4
+
+                  sm:min-h-[220px]
+
+                  lg:min-h-0
+                "
+              >
                 <img
                   src="/images/about/global-countries.svg"
                   alt=""
-                  className="w-full h-full max-h-[230px] xl:max-h-[250px] object-contain object-bottom pointer-events-none select-none opacity-85 group-hover:opacity-95 transition-opacity duration-300"
+                  aria-hidden="true"
+                  className="
+                    pointer-events-none
+                    h-full
+                    max-h-[230px]
+                    w-full
+                    select-none
+                    object-contain
+                    object-bottom
+                    opacity-85
+                    transition-opacity
+                    duration-300
+
+                    group-hover:opacity-95
+
+                    xl:max-h-[250px]
+                  "
                 />
 
-                {/* Layered HTML Country Pills */}
-                {content.countries.locations.map((location, idx) => {
-                  const pos = countryPositions[idx] || { top: '50%', left: '50%' };
-                  return (
-                    <div
-                      key={location}
-                      tabIndex={0}
-                      role="text"
-                      className="absolute bg-white/95 backdrop-blur-xs border border-slate-200/90 shadow-xs rounded-xl sm:rounded-2xl px-3 py-1.5 sm:px-4 sm:py-2 flex items-center gap-2 sm:gap-2.5 transition-all duration-200 cursor-default hover:bg-white hover:shadow-md hover:border-slate-300 select-none z-10"
-                      style={pos}
-                    >
-                      {/* Round indicator circle */}
-                      <span
-                        className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-300/80 shrink-0 inline-block shadow-inner"
-                        aria-hidden="true"
-                      />
-                      <span className="text-xs sm:text-sm font-medium text-[#082046] tracking-wide whitespace-nowrap">
-                        {location}
-                      </span>
-                    </div>
-                  );
-                })}
+                {/* COUNTRY PILLS */}
+
+                {content.countries.locations.map(
+                  (location, idx) => {
+                    const pos =
+                      countryPositions[idx] || {
+                        top: '50%',
+                        left: '50%',
+                      };
+
+                    const flag = getCountryFlag(location);
+
+                    return (
+                      <div
+                        key={location}
+                        tabIndex={0}
+                        role="text"
+                        className="
+                          absolute
+                          z-10
+                          flex
+                          cursor-default
+                          select-none
+                          items-center
+                          gap-2
+                          rounded-xl
+                          border
+                          border-slate-200/90
+                          bg-white/95
+                          px-3
+                          py-1.5
+                          shadow-xs
+                          backdrop-blur-xs
+                          transition-all
+                          duration-200
+
+                          hover:border-slate-300
+                          hover:bg-white
+                          hover:shadow-md
+
+                          sm:gap-2.5
+                          sm:rounded-2xl
+                          sm:px-4
+                          sm:py-2
+                        "
+                        style={pos}
+                      >
+                        {flag ? (
+                          <span
+                            aria-hidden="true"
+                            className="
+                              flex
+                              h-6
+                              w-6
+                              shrink-0
+                              items-center
+                              justify-center
+                              overflow-hidden
+                              rounded-full
+                              bg-white
+                              shadow-sm
+                              ring-1
+                              ring-slate-200
+
+                              sm:h-7
+                              sm:w-7
+                            "
+                          >
+                            <img
+                              src={flag}
+                              alt=""
+                              className="
+                                h-full
+                                w-full
+                                object-cover
+                              "
+                            />
+                          </span>
+                        ) : (
+                          <span
+                            aria-hidden="true"
+                            className="
+                              inline-block
+                              h-5
+                              w-5
+                              shrink-0
+                              rounded-full
+                              bg-slate-300/80
+                              shadow-inner
+
+                              sm:h-6
+                              sm:w-6
+                            "
+                          />
+                        )}
+
+                        <span
+                          className="
+                            whitespace-nowrap
+                            text-xs
+                            font-medium
+                            tracking-wide
+                            text-[#082046]
+
+                            sm:text-sm
+                          "
+                        >
+                          {location}
+                        </span>
+                      </div>
+                    );
+                  }
+                )}
               </div>
             </article>
 
-            {/* CARD 02 — Worldwide (Taller Left-Column Card ~54%) */}
+            {/* =================================================
+                CARD 02 — WORLDWIDE
+                ================================================= */}
+
             <article
               tabIndex={0}
               role="region"
               aria-label={`${content.worldwide.headline} - ${content.worldwide.subtitle}`}
-              className="group bg-white border border-slate-200/80 shadow-xs rounded-xl sm:rounded-2xl p-6 sm:p-7 lg:p-8 flex flex-col justify-between overflow-hidden transition-colors duration-300 outline-none focus-visible:ring-2 focus-visible:ring-[#032E64] lg:h-[560px] xl:h-[580px]"
+              className="
+                group
+                flex
+                flex-col
+                justify-between
+                overflow-hidden
+                rounded-xl
+                border
+                border-slate-200/80
+                bg-white
+                p-6
+                shadow-xs
+                outline-none
+                transition-colors
+                duration-300
+
+                focus-visible:ring-2
+                focus-visible:ring-[#032E64]
+
+                sm:rounded-2xl
+                sm:p-7
+
+                lg:h-[560px]
+                lg:p-8
+
+                xl:h-[580px]
+              "
             >
-              {/* Top Text Content */}
               <div className="shrink-0">
-                <h3 className="text-3xl sm:text-4xl lg:text-[38px] font-normal leading-tight text-[#082046] tracking-tight">
+                <h3
+                  className="
+                    text-3xl
+                    font-normal
+                    leading-tight
+                    tracking-tight
+                    text-[#082046]
+
+                    sm:text-4xl
+
+                    lg:text-[38px]
+                  "
+                >
                   {content.worldwide.headline}
                 </h3>
-                <h4 className="text-base sm:text-lg font-medium text-[#082046] mt-3 sm:mt-4">
+
+                <h4
+                  className="
+                    mt-3
+                    text-base
+                    font-medium
+                    text-[#082046]
+
+                    sm:mt-4
+                    sm:text-lg
+                  "
+                >
                   {content.worldwide.subtitle}
                 </h4>
-                <p className="text-xs sm:text-[13.5px] text-slate-600 font-normal leading-relaxed mt-2 max-w-md">
+
+                <p
+                  className="
+                    mt-2
+                    max-w-md
+                    text-xs
+                    font-normal
+                    leading-relaxed
+                    text-slate-600
+
+                    sm:text-[13.5px]
+                  "
+                >
                   {content.worldwide.description}
                 </p>
               </div>
 
-              {/* Lower Image Graphic (Fills remaining vertical room cleanly) */}
-              <div className="w-full flex-1 mt-6 sm:mt-7 overflow-hidden rounded-xl sm:rounded-2xl bg-slate-100 min-h-[220px] sm:min-h-[260px] lg:min-h-0">
+              <div
+                className="
+                  mt-6
+                  min-h-[220px]
+                  w-full
+                  flex-1
+                  overflow-hidden
+                  rounded-xl
+                  bg-slate-100
+
+                  sm:mt-7
+                  sm:min-h-[260px]
+                  sm:rounded-2xl
+
+                  lg:min-h-0
+                "
+              >
                 <img
                   src={
                     content.worldwide.image?.src ||
@@ -295,136 +932,532 @@ export const AboutGlobalExpertiseSection: React.FC<
                     content.worldwide.image?.alt ||
                     'Worldwide certification and global capability'
                   }
-                  className="w-full h-full object-cover object-center rounded-xl sm:rounded-2xl transition-opacity duration-300 opacity-95 group-hover:opacity-100"
+                  className="
+                    h-full
+                    w-full
+                    rounded-xl
+                    object-cover
+                    object-center
+                    opacity-95
+                    transition-opacity
+                    duration-300
+
+                    group-hover:opacity-100
+
+                    sm:rounded-2xl
+                  "
                 />
               </div>
             </article>
           </div>
 
-          {/* RIGHT COLUMN (Desktop Scroll-Linked Upward Translation) */}
-          <div ref={rightColRef} className="flex flex-col gap-6 lg:gap-8">
-            {/* CARD 03 — 15+ Offices (Taller Right-Column Card ~60% — visibly taller than 10+ Countries) */}
+          {/* ===================================================
+              RIGHT COLUMN
+              =================================================== */}
+
+          <div
+            ref={rightColRef}
+            className="
+              flex
+              flex-col
+              gap-6
+
+              lg:gap-8
+            "
+          >
+            {/* =================================================
+                CARD 03 — OFFICES
+                ================================================= */}
+
             <article
               tabIndex={0}
               role="region"
               aria-label={`${content.offices.headline} - ${content.offices.subtitle}`}
-              className="group bg-white border border-slate-200/80 shadow-xs rounded-xl sm:rounded-2xl p-6 sm:p-7 lg:p-8 flex flex-col justify-between overflow-hidden transition-colors duration-300 outline-none focus-visible:ring-2 focus-visible:ring-[#032E64] lg:h-[630px] xl:h-[650px]"
+              className="
+                group
+                flex
+                flex-col
+                justify-between
+                overflow-hidden
+                rounded-xl
+                border
+                border-slate-200/80
+                bg-white
+                p-6
+                shadow-xs
+                outline-none
+                transition-colors
+                duration-300
+
+                focus-visible:ring-2
+                focus-visible:ring-[#032E64]
+
+                sm:rounded-2xl
+                sm:p-7
+
+                lg:h-[630px]
+                lg:p-8
+
+                xl:h-[650px]
+              "
             >
-              {/* Upper Orbit Visual Graphic (Generous vertical space) */}
-              <div className="w-full flex-1 flex items-center justify-center p-2 sm:p-4 mb-4 sm:mb-6 min-h-[240px] sm:min-h-[280px] lg:min-h-0">
+              <div
+                className="
+                  mb-4
+                  flex
+                  min-h-[240px]
+                  w-full
+                  flex-1
+                  items-center
+                  justify-center
+                  p-2
+
+                  sm:mb-6
+                  sm:min-h-[280px]
+                  sm:p-4
+
+                  lg:min-h-0
+                "
+              >
                 <img
                   src="/images/about/global-offices.svg"
                   alt=""
-                  className="w-full max-w-[360px] sm:max-w-[420px] xl:max-w-[460px] max-h-[360px] xl:max-h-[400px] h-auto object-contain pointer-events-none select-none opacity-90 group-hover:opacity-100 transition-opacity duration-300"
+                  aria-hidden="true"
+                  className="
+                    pointer-events-none
+                    h-auto
+                    max-h-[360px]
+                    w-full
+                    max-w-[360px]
+                    select-none
+                    object-contain
+                    opacity-90
+                    transition-opacity
+                    duration-300
+
+                    group-hover:opacity-100
+
+                    sm:max-w-[420px]
+
+                    xl:max-h-[400px]
+                    xl:max-w-[460px]
+                  "
                 />
               </div>
 
-              {/* Lower Text Content */}
               <div className="shrink-0">
-                <h3 className="text-3xl sm:text-4xl lg:text-[38px] font-normal leading-tight text-[#082046] tracking-tight">
+                <h3
+                  className="
+                    text-3xl
+                    font-normal
+                    leading-tight
+                    tracking-tight
+                    text-[#082046]
+
+                    sm:text-4xl
+
+                    lg:text-[38px]
+                  "
+                >
                   {content.offices.headline}
                 </h3>
-                <h4 className="text-base sm:text-lg font-medium text-[#082046] mt-3 sm:mt-4">
+
+                <h4
+                  className="
+                    mt-3
+                    text-base
+                    font-medium
+                    text-[#082046]
+
+                    sm:mt-4
+                    sm:text-lg
+                  "
+                >
                   {content.offices.subtitle}
                 </h4>
-                <p className="text-xs sm:text-[13.5px] text-slate-600 font-normal leading-relaxed mt-2 max-w-md">
+
+                <p
+                  className="
+                    mt-2
+                    max-w-md
+                    text-xs
+                    font-normal
+                    leading-relaxed
+                    text-slate-600
+
+                    sm:text-[13.5px]
+                  "
+                >
                   {content.offices.description}
                 </p>
               </div>
             </article>
 
-            {/* CARD 04 — Multiple Industries (Shorter Right-Column Card ~40% — shorter than 15+ Offices) */}
+            {/* =================================================
+                CARD 04 — INDUSTRIES
+                ================================================= */}
+
             <article
               tabIndex={0}
               role="region"
               aria-label={`${content.industries.headline} - ${content.industries.subtitle}`}
-              className="group bg-white border border-slate-200/80 shadow-xs rounded-xl sm:rounded-2xl p-6 sm:p-7 lg:p-8 flex flex-col justify-between overflow-hidden transition-colors duration-300 outline-none focus-visible:ring-2 focus-visible:ring-[#032E64] lg:h-[410px] xl:h-[430px]"
+              className="
+                group
+                flex
+                flex-col
+                justify-between
+                overflow-hidden
+                rounded-xl
+                border
+                border-slate-200/80
+                bg-white
+                p-6
+                shadow-xs
+                outline-none
+                transition-colors
+                duration-300
+
+                focus-visible:ring-2
+                focus-visible:ring-[#032E64]
+
+                sm:rounded-2xl
+                sm:p-7
+
+                lg:h-[410px]
+                lg:p-8
+
+                xl:h-[430px]
+              "
             >
-              {/* Upper Horizontal Industry Icon Strip — Continuous Smooth Marquee */}
+              {/* ===============================================
+                  INDUSTRY MARQUEE
+                  =============================================== */}
+
               <div
+                ref={marqueeViewportRef}
                 role="toolbar"
                 aria-label="Industries we serve"
-                className="w-full bg-gradient-to-r from-[#1B3679] via-[#284E94] to-[#4572B8] rounded-xl sm:rounded-2xl p-2.5 sm:p-3 mb-4 sm:mb-6 overflow-hidden shadow-xs shrink-0 relative select-none"
+                className="
+                  relative
+                  mb-4
+                  h-[64px]
+                  w-full
+                  shrink-0
+                  overflow-hidden
+                  rounded-xl
+                  bg-gradient-to-r
+                  from-[#1B3679]
+                  via-[#284E94]
+                  to-[#4572B8]
+                  shadow-xs
+
+                  sm:mb-6
+                  sm:h-[72px]
+                  sm:rounded-2xl
+                "
               >
-                <div className="industry-marquee-track">
-                  {/* Track 1 */}
-                  <div className="flex items-center gap-2 sm:gap-3 shrink-0 pr-2 sm:pr-3">
-                    {industryItems.map((industry) => {
-                      const isActive = industry.id === activeIndustryId;
-                      const IconComp = getIndustryIcon(industry.iconKey);
+                {/* LEFT MASK */}
 
-                      return (
-                        <button
-                          key={`track1-${industry.id}`}
-                          type="button"
-                          tabIndex={0}
-                          aria-label={industry.label}
-                          aria-pressed={isActive}
-                          onPointerEnter={() => setActiveIndustryId(industry.id)}
-                          onFocus={() => setActiveIndustryId(industry.id)}
-                          onClick={() => setActiveIndustryId(industry.id)}
-                          className={`relative flex items-center justify-center shrink-0 rounded-xl sm:rounded-2xl transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-white ${
-                            isActive
-                              ? 'w-10 h-10 sm:w-12 sm:h-12 bg-white text-[#082046] shadow-sm scale-105'
-                              : 'w-9 h-9 sm:w-11 sm:h-11 bg-white/10 text-white hover:bg-white/20'
-                          }`}
-                        >
-                          <IconComp
-                            size={isActive ? 22 : 19}
-                            weight={isActive ? 'bold' : 'regular'}
-                            aria-hidden="true"
-                          />
-                        </button>
-                      );
-                    })}
-                  </div>
+                <div
+                  aria-hidden="true"
+                  className="
+                    pointer-events-none
+                    absolute
+                    inset-y-0
+                    left-0
+                    z-20
+                    w-6
+                    bg-gradient-to-r
+                    from-[#1B3679]
+                    to-transparent
 
-                  {/* Track 2 for seamless, jump-free loop */}
-                  <div className="flex items-center gap-2 sm:gap-3 shrink-0 pr-2 sm:pr-3" aria-hidden="true">
-                    {industryItems.map((industry) => {
-                      const isActive = industry.id === activeIndustryId;
-                      const IconComp = getIndustryIcon(industry.iconKey);
+                    sm:w-10
+                  "
+                />
 
-                      return (
-                        <button
-                          key={`track2-${industry.id}`}
-                          type="button"
-                          tabIndex={-1}
-                          aria-label={industry.label}
-                          aria-pressed={isActive}
-                          onPointerEnter={() => setActiveIndustryId(industry.id)}
-                          onFocus={() => setActiveIndustryId(industry.id)}
-                          onClick={() => setActiveIndustryId(industry.id)}
-                          className={`relative flex items-center justify-center shrink-0 rounded-xl sm:rounded-2xl transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-white ${
-                            isActive
-                              ? 'w-10 h-10 sm:w-12 sm:h-12 bg-white text-[#082046] shadow-sm scale-105'
-                              : 'w-9 h-9 sm:w-11 sm:h-11 bg-white/10 text-white hover:bg-white/20'
-                          }`}
-                        >
-                          <IconComp
-                            size={isActive ? 22 : 19}
-                            weight={isActive ? 'bold' : 'regular'}
-                            aria-hidden="true"
-                          />
-                        </button>
-                      );
-                    })}
+                {/* RIGHT MASK */}
+
+                <div
+                  aria-hidden="true"
+                  className="
+                    pointer-events-none
+                    absolute
+                    inset-y-0
+                    right-0
+                    z-20
+                    w-6
+                    bg-gradient-to-l
+                    from-[#4572B8]
+                    to-transparent
+
+                    sm:w-10
+                  "
+                />
+
+                {/* VERTICAL CENTRING WRAPPER */}
+
+                <div
+                  className="
+                    absolute
+                    inset-0
+                    flex
+                    items-center
+                    overflow-hidden
+                  "
+                >
+                  {/* MOVING TRACK */}
+
+                  <div
+                    ref={marqueeTrackRef}
+                    className="
+                      flex
+                      w-max
+                      max-w-none
+                      shrink-0
+                      flex-row
+                      flex-nowrap
+                      items-center
+                      will-change-transform
+                    "
+                  >
+                    {/* ===========================================
+                        PRIMARY SET
+                        =========================================== */}
+
+                    <div
+                      ref={marqueeSetRef}
+                      className="
+                        flex
+                        w-max
+                        shrink-0
+                        flex-row
+                        flex-nowrap
+                        items-center
+                        gap-2
+                        pr-2
+
+                        sm:gap-3
+                        sm:pr-3
+                      "
+                    >
+                      {industryItems.map((industry) => {
+                        const isActive =
+                          industry.id === activeIndustryId;
+
+                        const IconComp = getIndustryIcon(
+                          industry.iconKey
+                        );
+
+                        return (
+                          <button
+                            key={`industry-primary-${industry.id}`}
+                            type="button"
+                            aria-label={industry.label}
+                            aria-pressed={isActive}
+                            onPointerEnter={() =>
+                              setActiveIndustryId(industry.id)
+                            }
+                            onFocus={() =>
+                              setActiveIndustryId(industry.id)
+                            }
+                            onClick={() =>
+                              setActiveIndustryId(industry.id)
+                            }
+                            className={`
+                              relative
+                              flex
+                              flex-none
+                              shrink-0
+                              items-center
+                              justify-center
+                              rounded-xl
+                              outline-none
+                              transition-[background-color,color,box-shadow]
+                              duration-200
+
+                              sm:rounded-2xl
+
+                              ${
+                                isActive
+                                  ? `
+                                    h-[46px]
+                                    w-[46px]
+                                    bg-white
+                                    text-[#082046]
+                                    shadow-sm
+
+                                    sm:h-[50px]
+                                    sm:w-[50px]
+                                  `
+                                  : `
+                                    h-[42px]
+                                    w-[42px]
+                                    bg-white/10
+                                    text-white/80
+
+                                    hover:bg-white/20
+                                    hover:text-white
+
+                                    sm:h-[46px]
+                                    sm:w-[46px]
+                                  `
+                              }
+
+                              focus-visible:ring-2
+                              focus-visible:ring-white
+                              focus-visible:ring-offset-2
+                              focus-visible:ring-offset-[#284E94]
+                            `}
+                          >
+                            <IconComp
+                              size={isActive ? 22 : 19}
+                              weight={
+                                isActive ? 'bold' : 'regular'
+                              }
+                              aria-hidden="true"
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* ===========================================
+                        DUPLICATE SET
+                        Decorative only.
+                        Required for seamless wrap.
+                        =========================================== */}
+
+                    <div
+                      aria-hidden="true"
+                      className="
+                        flex
+                        w-max
+                        shrink-0
+                        flex-row
+                        flex-nowrap
+                        items-center
+                        gap-2
+                        pr-2
+
+                        sm:gap-3
+                        sm:pr-3
+                      "
+                    >
+                      {industryItems.map((industry) => {
+                        const isActive =
+                          industry.id === activeIndustryId;
+
+                        const IconComp = getIndustryIcon(
+                          industry.iconKey
+                        );
+
+                        return (
+                          <div
+                            key={`industry-clone-${industry.id}`}
+                            className={`
+                              relative
+                              flex
+                              flex-none
+                              shrink-0
+                              items-center
+                              justify-center
+                              rounded-xl
+                              transition-[background-color,color,box-shadow]
+                              duration-200
+
+                              sm:rounded-2xl
+
+                              ${
+                                isActive
+                                  ? `
+                                    h-[46px]
+                                    w-[46px]
+                                    bg-white
+                                    text-[#082046]
+                                    shadow-sm
+
+                                    sm:h-[50px]
+                                    sm:w-[50px]
+                                  `
+                                  : `
+                                    h-[42px]
+                                    w-[42px]
+                                    bg-white/10
+                                    text-white/80
+
+                                    sm:h-[46px]
+                                    sm:w-[46px]
+                                  `
+                              }
+                            `}
+                          >
+                            <IconComp
+                              size={isActive ? 22 : 19}
+                              weight={
+                                isActive ? 'bold' : 'regular'
+                              }
+                              aria-hidden="true"
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Lower Text Content */}
+              {/* ===============================================
+                  INDUSTRIES TEXT
+                  =============================================== */}
+
               <div className="shrink-0">
-                <h3 className="text-3xl sm:text-4xl lg:text-[38px] font-normal leading-tight text-[#082046] tracking-tight">
+                <h3
+                  className="
+                    text-3xl
+                    font-normal
+                    leading-tight
+                    tracking-tight
+                    text-[#082046]
+
+                    sm:text-4xl
+
+                    lg:text-[38px]
+                  "
+                >
                   {content.industries.headline}
                 </h3>
-                <h4 className="text-base sm:text-lg font-medium text-[#082046] mt-3 sm:mt-4">
+
+                <h4
+                  className="
+                    mt-3
+                    text-base
+                    font-medium
+                    text-[#082046]
+
+                    sm:mt-4
+                    sm:text-lg
+                  "
+                >
                   {content.industries.subtitle}
                 </h4>
-                <p className="text-xs sm:text-[13.5px] text-slate-600 font-normal leading-relaxed mt-2 max-w-lg">
+
+                <p
+                  className="
+                    mt-2
+                    max-w-lg
+                    text-xs
+                    font-normal
+                    leading-relaxed
+                    text-slate-600
+
+                    sm:text-[13.5px]
+                  "
+                >
                   Serving{' '}
                   <strong className="font-bold text-[#082046]">
-                    organisations across Oil &amp; Gas, Power, Mining, Construction, Engineering, Chemical, Food
+                    organisations across Oil &amp; Gas, Power,
+                    Mining, Construction, Engineering, Chemical,
+                    Food
                   </strong>{' '}
                   and other industries.
                 </p>

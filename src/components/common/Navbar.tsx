@@ -616,26 +616,22 @@ export const Navbar: React.FC = () => {
               </button>
 
               {isMobileServicesExpanded && (
-                <div className="pl-4 pr-2 py-1 space-y-1 bg-[#F8FAFB] rounded-lg mt-1 border border-[#E2E8F0]">
-                  {SERVICES_LIST.map((s) => (
-                    <Link
-                      key={s.slug}
-                      to={`/services/${s.slug}`}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="block px-2.5 py-1.5 text-xs text-[#032E64] hover:bg-white rounded-md font-medium"
-                    >
-                      {s.title}
-                    </Link>
-                  ))}
-                  <Link
-                    to="/services"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="block px-2.5 py-1.5 text-xs text-[#00607A] font-semibold underline"
-                  >
-                    All Services Index &rarr;
-                  </Link>
-                </div>
-              )}
+  <div className="pl-4 pr-2 py-1 space-y-1 bg-[#F8FAFB] rounded-lg mt-1 border border-[#E2E8F0]">
+    {SERVICES_LIST.map((s) => (
+      <Link
+        key={s.slug}
+        to={`/services/${s.slug}`}
+        onClick={() => {
+          setIsMobileMenuOpen(false);
+          setIsMobileServicesExpanded(false);
+        }}
+        className="block px-2.5 py-1.5 text-xs text-[#032E64] hover:bg-white rounded-md font-medium"
+      >
+        {s.title}
+      </Link>
+    ))}
+  </div>
+)}
             </div>
 
             <Link

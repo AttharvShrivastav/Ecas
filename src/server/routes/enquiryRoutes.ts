@@ -68,6 +68,10 @@ publicEnquiryRouter.post('/', async (req: Request, res: Response) => {
       country,
       enquiryType,
       message,
+      // The current public contact form does not collect an explicit
+      // privacy-consent checkbox. Keep the stored value false rather than
+      // claiming consent that the user did not provide.
+      privacyConsent: false,
       sourcePage
     });
 
